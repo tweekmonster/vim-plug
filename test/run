@@ -2,6 +2,24 @@
 
 cd $(dirname "${BASH_SOURCE[0]}")
 
+if [ -d /testplugin ] && [[ "$1" =~ "vim-" ]]; then
+  # Copied to keep Docker from writing to volume
+  VIM="/vim-build/bin/$1"
+  shift
+
+  if [ ! -e $VIM ]; then
+    echo "$VIM not found"
+    exit 1
+  fi
+
+  ln -s $VIM /usr/bin/vim
+  cp -rp /testplugin /home/vim-plug
+  chown -R vimtest:vimtest /home
+  cd /home/vim-plug/test
+  su -l vimtest -c "/home/vim-plug/test/run $@"
+  exit $?
+fi
+
 export BASE="$PWD"
 export PLUG_SRC="$PWD/../plug.vim"
 export PLUG_FIXTURES="$PWD/fixtures"
@@ -19,6 +37,11 @@ clone() {
 }
 
 clone_repos() (
+  if [ -z $(git config --global user.email) ]; then
+    git config --global user.email "you@example.com"
+    git config --global user.name "Your Name"
+  fi
+
   cd /tmp
   mkdir -p junegunn vim-scripts jg
   for repo in vader.vim goyo.vim rust.vim seoul256.vim vim-easy-align vim-fnr \
