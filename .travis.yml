@@ -8,10 +8,11 @@ env:
   - VIM=vim-plain
   - VIM=vim-py
   - VIM=vim-py3
-  - VIM=vim-ruby
+  - VIM=vim-ruby1
+  - VIM=vim-ruby2
 
 before_script:
-  - docker pull tweekmonster/vim-plug
+  - docker pull tweekmonster/vim-plug:debian
 
 script:
-  - docker run -it --rm -v $PWD:/testplugin tweekmonster/vim-plug $VIM !
+  - docker run -it --rm -v $PWD:/testplugin tweekmonster/vim-plug:debian $VIM !
